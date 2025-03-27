@@ -30,7 +30,3 @@ Thumbs.db
 # Coverage reports
 coverage/
 
-# Debug files
-*.pid
-*.seed
-*.pid.lock
