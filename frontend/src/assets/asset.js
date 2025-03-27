@@ -90,8 +90,9 @@ import cart from './cart.svg'
 import menu from './menu.png'
 import dropdown from './dropdown.svg'
 import hero from "./hero.png"
+import stuff from "./stuff.png"
 export const images = {
-  logo,search,profile,cart,menu,dropdown,hero
+  logo,search,profile,cart,menu,dropdown,hero,stuff
 }
 
 export const products = [
