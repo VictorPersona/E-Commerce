@@ -83,11 +83,15 @@ import img_82 from './Products/img_82.jpg'
 import img_83 from './Products/img_83.jpg'
 import img_84 from './Products/img_84.jpg'
 
-
+import profile from './profile.png'
 import logo from './logo.png'
 import search from './search.svg'
+import cart from './cart.svg'
+import menu from './menu.png'
+import dropdown from './dropdown.svg'
+import hero from "./hero.png"
 export const images = {
-  logo,search
+  logo,search,profile,cart,menu,dropdown,hero
 }
 
 export const products = [
