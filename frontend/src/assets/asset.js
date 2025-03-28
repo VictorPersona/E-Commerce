@@ -211,6 +211,8 @@ import img_201 from './Products/img_201.jpg'
 import img_202 from './Products/img_202.jpg'
 import img_203 from './Products/img_203.jpg'
 import img_204 from './Products/img_204.jpg'
+import starFull from './star-full.svg'
+import starEmpty from './star-empty.svg'
 
 import cross from './cross.svg'
 export const images = {
@@ -223,6 +225,8 @@ export const images = {
   hero,
   stuff,
   cross,
+  starFull,
+  starEmpty
 }
 
 export const products = [
