@@ -123,8 +123,6 @@ import img_122 from './Products/img_122.jpg'
 import img_123 from './Products/img_123.jpg'
 import img_124 from './Products/img_124.jpg'
 
-
-
 import profile from './profile.png'
 import logo from './logo.png'
 import search from './search.svg'
@@ -214,6 +212,7 @@ import img_202 from './Products/img_202.jpg'
 import img_203 from './Products/img_203.jpg'
 import img_204 from './Products/img_204.jpg'
 
+import cross from './cross.svg'
 export const images = {
   logo,
   search,
@@ -223,6 +222,7 @@ export const images = {
   dropdown,
   hero,
   stuff,
+  cross,
 }
 
 export const products = [

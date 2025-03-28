@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { images } from '../assets/asset'
+import { ShopContext } from '../context/ShopContext'
 
 const Navbar = () => {
   // State to manage the visibility of the mobile menu
   const [visible, setVisible] = useState(false)
+  const {showSearch,setShowSearch} = useContext(ShopContext)
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
@@ -36,7 +38,14 @@ const Navbar = () => {
       {/* Icons Section */}
       <div className="flex items-center gap-6">
         {/* Search Icon */}
-        <img src={images.search} alt="Search" className="w-5 cursor-pointer" />
+        <img
+          onClick={() => {
+            setShowSearch(!showSearch)
+          }}
+          src={images.search}
+          alt="Search"
+          className="w-5 cursor-pointer"
+        />
 
         {/* Profile Icon with Dropdown */}
         <div className="group relative">

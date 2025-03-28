@@ -5,7 +5,7 @@ import { images } from '../assets/asset'
 import ProductItem from '../components/ProductItem'
 
 const Collection = () => {
-  const products = useContext(ShopContext).products
+  const { products, search, showSearch } = useContext(ShopContext)
   const [showFilters, setShowFilters] = useState(true)
   const [filteredProducts, setFilteredProducts] = useState([])
   const [category, setCategory] = useState([])
@@ -30,6 +30,11 @@ const Collection = () => {
 
   const applyfilters = () => {
     let temp = products
+    if (showSearch) {
+      temp = temp.filter((product) =>
+        product.name.toLowerCase().includes(search.toLowerCase())
+      )
+    }
     if (category.length > 0) {
       temp = temp.filter((product) => category.includes(product.category))
     }
@@ -59,7 +64,7 @@ const Collection = () => {
   }, [sortType])
   useEffect(() => {
     applyfilters()
-  }, [category, subCategory])
+  }, [category, subCategory, search, showSearch])
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
       <div className="min-w-60">
