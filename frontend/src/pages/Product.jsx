@@ -2,21 +2,23 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext'
 import { images } from '../assets/asset'
+import RelatedProjects from '../components/RelatedProjects'
 
 const Product = () => {
   const { id } = useParams()
-  const { products, currency } = useContext(ShopContext)
+  const { products, currency, addToCart } = useContext(ShopContext)
   const [productData, setProductData] = useState(false)
   const [useImage, setImage] = useState('')
+  const [productSize, setSize] = useState('')
 
   const fetchProductData = async () => {
-    products.map((product) =>
-      product._id == id ? setProductData(product) : null
-    )
-    setImage(productData.image[0])
+    const product = products.find((product) => product._id === id)
+    if (product) {
+      setProductData(product)
+      setImage(product.image[0])
+    }
   }
 
-  const [productSize, setSize] = useState('')
 
   useEffect(() => {
     fetchProductData()
@@ -25,22 +27,27 @@ const Product = () => {
   return (
     <div>
       {productData ? (
-        <div className=" border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
+        <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
           <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
             <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
               <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-                {productData.image.map((item, index) => (
-                  <img
-                    src={item}
-                    key={index}
-                    onClick={() => setImage(item)}
-                    className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
-                    alt=""
-                  />
-                ))}
+                {productData &&
+                  productData.image.map((item, index) => (
+                    <img
+                      src={item}
+                      key={index}
+                      onClick={() => setImage(item)}
+                      className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
+                      alt=""
+                    />
+                  ))}
               </div>
               <div className="w-full sm:w-[80%]">
-                <img src={useImage} className="w-full h-auto" alt="" />
+                {useImage ? (
+                  <img src={useImage} className="w-full h-auto" alt="Product" />
+                ) : (
+                  <div>Loading image...</div> // Optional fallback
+                )}
               </div>
             </div>
             <div className="flex-1">
@@ -75,10 +82,10 @@ const Product = () => {
                     </button>
                   ))}
                 </div>
-                <button className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700">
+                <button onClick={()=>addToCart({itemId:productData._id,size:productSize})} className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700">
                   Add to Cart
                 </button>
-                <hr className='mt-8 sm:w-4/5'/>
+                <hr className="mt-8 sm:w-4/5" />
                 <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
                   <p>100% Original Product</p>
                   <p>Cash on delivery is available on this product</p>
@@ -87,15 +94,19 @@ const Product = () => {
                 <div className="mt-20">
                   <div className="flex">
                     <b className="border px-5 py-3 text-sm">Description</b>
-                    <p className='border px-5 py-3 text-sm'>Reviews(122)</p>
+                    <p className="border px-5 py-3 text-sm">Reviews(122)</p>
                   </div>
                 </div>
+                <RelatedProjects
+                  category={productData.category}
+                  subCategory={productData.subCategory}
+                />
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="opacity-0"></div>
+        <div>Loading...</div>
       )}
     </div>
   )
