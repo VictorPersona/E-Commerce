@@ -5,12 +5,10 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { ShopContextProvider } from './context/ShopContext'
 
-
 createRoot(document.getElementById('root')).render(
-  <ShopContextProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-    ,
-  </ShopContextProvider>
+  <BrowserRouter>
+    <ShopContextProvider>
+      <App />,
+    </ShopContextProvider>{' '}
+  </BrowserRouter>
 )

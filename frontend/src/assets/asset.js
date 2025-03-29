@@ -213,9 +213,10 @@ import img_203 from './Products/img_203.jpg'
 import img_204 from './Products/img_204.jpg'
 import starFull from './star-full.svg'
 import starEmpty from './star-empty.svg'
-
+import bin from './bin.png'
 import cross from './cross.svg'
 export const images = {
+  bin,
   logo,
   search,
   profile,
