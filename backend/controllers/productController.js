@@ -70,17 +70,40 @@ export const listProduct = async (req, res) => {
       message: 'Products displayed successfuly',
       products,
     })
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+    res.json({success:false,message:"error in listing products",error:error})
+  }
 }
 
 //Remove Product
 export const removeProduct = async (req, res) => {
     try {
-        
+        await productModel.findByIdAndDelete(req.body.id)
+        res.json({success:true,message:"product deleted successfully"})
     } catch (error) {
-        
+        console.log(error)
+        res.json({
+          success: false,
+          message: 'error in deleting product',
+          error: error,
+        })
+
     }
 }
 
 //Single Product
-export const singleProduct = async (req, res) => {}
+export const singleProduct = async (req, res) => {
+    try {
+        const productId = req.body.id
+        const product = productModel.findById(productId)
+        res.json({success:true,message:"product fetched successfully",product})
+    } catch (error) {
+         console.log(error)
+         res.json({
+           success: false,
+           message: 'error in fetching product',
+           error: error,
+         })
+    }
+}

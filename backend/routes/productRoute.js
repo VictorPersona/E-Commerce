@@ -6,6 +6,7 @@ import {
   removeProduct,
 } from '../controllers/productController.js'
 import upload from '../middleware/multer.js'
+import { adminAuth } from '../middleware/adminAuth.js'
 
 const productRouter = express.Router()
 
@@ -19,9 +20,9 @@ productRouter.post(
   ]),
   addProduct
 )
-productRouter.post('/remove', removeProduct)
+productRouter.delete('/remove', adminAuth, removeProduct)
 productRouter.post('/single', singleProduct)
 
-productRouter.get('/list', listProduct)
+productRouter.get('/list', adminAuth, listProduct)
 
 export default productRouter

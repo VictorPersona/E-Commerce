@@ -77,4 +77,24 @@ export const userRegistration = async (req, res) => {
 }
 
 //Admin Registration
-export const adminLogin = async (req, res) => {}
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body
+   
+    if (email !== process.env.ADMIN_EMAIL) {
+      return res.json({ success: false, message: 'Email not found' })
+    }
+    if (password !== process.env.ADMIN_PASSWORD) {
+      return res.json({ success: false, message: 'Wrong Password' })
+    }
+    const token = jwt.sign({ email }, process.env.JWT_SECRET)
+    res.json({ success: true, message: 'Admin login successful', token })
+  } catch (error) {
+    console.log(error)
+    res.json({
+      success: false,
+      message: 'admin login error',
+      error: error.message,
+    })
+  }
+}
