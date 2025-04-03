@@ -37,8 +37,8 @@ export const addProduct = async (req, res) => {
       price: Number(price),
       category,
       subCategory,
-      sizes: JSON.parse(sizes),
-      bestSeller: bestSeller === true ? true : false,
+      sizes: sizes ? JSON.parse(sizes) : [], 
+      bestSeller: bestSeller === 'true', 
       date: Date.now(),
       image: imageUrl,
     }
@@ -49,13 +49,13 @@ export const addProduct = async (req, res) => {
 
     res.json({
       success: true,
-      message: `product created with id ${product.id}`,
+      message: `Product created with id ${product.id}`,
     })
   } catch (error) {
     console.log(error)
     res.json({
       success: false,
-      message: 'add Product not working',
+      message: 'Add Product not working',
       error: error,
     })
   }
@@ -72,7 +72,7 @@ export const listProduct = async (req, res) => {
     })
   } catch (error) {
     console.log(error)
-    res.json({success:false,message:"error in listing products",error:error})
+    res.json({success:false,message:"Error in listing products",error:error})
   }
 }
 
@@ -80,12 +80,12 @@ export const listProduct = async (req, res) => {
 export const removeProduct = async (req, res) => {
     try {
         await productModel.findByIdAndDelete(req.body.id)
-        res.json({success:true,message:"product deleted successfully"})
+        res.json({success:true,message:"Product deleted successfully"})
     } catch (error) {
         console.log(error)
         res.json({
           success: false,
-          message: 'error in deleting product',
+          message: 'Error in deleting product',
           error: error,
         })
 
@@ -97,12 +97,12 @@ export const singleProduct = async (req, res) => {
     try {
         const productId = req.body.id
         const product = productModel.findById(productId)
-        res.json({success:true,message:"product fetched successfully",product})
+        res.json({success:true,message:"Product fetched successfully",product})
     } catch (error) {
          console.log(error)
          res.json({
            success: false,
-           message: 'error in fetching product',
+           message: 'Error in fetching product',
            error: error,
          })
     }

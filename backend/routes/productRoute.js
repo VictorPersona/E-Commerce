@@ -23,6 +23,6 @@ productRouter.post(
 productRouter.delete('/remove', adminAuth, removeProduct)
 productRouter.post('/single', singleProduct)
 
-productRouter.get('/list', adminAuth, listProduct)
+productRouter.get('/list', listProduct)
 
 export default productRouter

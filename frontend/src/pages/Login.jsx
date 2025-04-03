@@ -1,11 +1,54 @@
-import React, { useContext, useState } from 'react'
+import axios from 'axios'
+import React, { useContext, useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import { ShopContext } from '../context/ShopContext'
 
 const Login = () => {
-  const [currentState, setCurrentState] = useState('SIGNUP')
+  const { token, setToken, navigate, backendUrl } = useContext(ShopContext)
+  const [currentState, setCurrentState] = useState('LOGIN')
+
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const onSubmitHandler = async (event) => {
     event.preventDefault()
+    try {
+      if (currentState == 'SIGNUP') {
+        const response = await axios.post(backendUrl + '/api/user/register', {
+          name,
+          email,
+          password,
+        })
+        if (response.data.success) {
+          setToken(response.data.token)
+          localStorage.setItem('token', response.data.token)
+        } else {
+          toast.error(response.data.message)
+        }
+      } else {
+        const response = await axios.post(backendUrl + '/api/user/login', {
+          email,
+          password,
+        })
+        if (response.data.success) {
+          setToken(response.data.token)
+          localStorage.setItem('token', response.data.token)
+        } else {
+          toast.error(response.data.message)
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error('Error in Login')
+    }
   }
+
+useEffect(()=>{
+  if(token){
+    navigate('/')
+  }
+},[token])
 
   return (
     <form
@@ -18,6 +61,8 @@ const Login = () => {
       </div>
       {currentState == 'LOGIN' ? null : (
         <input
+          onChange={(e) => setName(e.target.value)}
+          value={name}
           className="w-full px-3 py-2 border  border-gray-800"
           type="text"
           placeholder="Name"
@@ -25,12 +70,16 @@ const Login = () => {
         />
       )}
       <input
+        onChange={(e) => setEmail(e.target.value)}
+        value={email}
         className="w-full px-3 py-2 border  border-gray-800"
         type="email"
         placeholder="E-mail"
         required
       />
       <input
+        onChange={(e) => setPassword(e.target.value)}
+        value={password}
         className="w-full px-3 py-2  border border-gray-800"
         type="password"
         placeholder="Password"
@@ -54,21 +103,11 @@ const Login = () => {
           </p>
         )}
       </div>
-      <button className="bg-black text-white font-light px-8 py-2 mt-4">
+      <button className=" cursor-pointer bg-black text-white font-light px-8 py-2 mt-4">
         {currentState == 'SIGNUP' ? (
-          <p
-            className="cursor-pointer"
-            onClick={() => setCurrentState('LOGIN')}
-          >
-            Login
-          </p>
+          <p className="cursor-pointer">Sign Up</p>
         ) : (
-          <p
-            className="cursor-pointer"
-            onClick={() => setCurrentState('SIGNUP')}
-          >
-            Sign Up
-          </p>
+          <p className="cursor-pointer">Log In</p>
         )}
       </button>
     </form>

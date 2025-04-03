@@ -1,18 +1,117 @@
+/**
+ * ShopContext.jsx
+ *
+ * This file defines the ShopContext and its provider, which manages the state and functionality
+ * for an e-commerce application. It includes product data, cart management, and utility functions
+ * for interacting with the shopping cart and backend API.
+ */
+
 import { createContext, useContext, useEffect, useState } from 'react'
 import asset from '../assets/asset'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
+/**
+ * Creates a React context for the shop.
+ * @type {React.Context}
+ */
 export const ShopContext = createContext()
 
+/**
+ * ShopContextProvider component that wraps children components and provides
+ * the shop context value.
+ *
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - Child components to be wrapped by the provider.
+ * @returns {JSX.Element} The provider component.
+ */
 export const ShopContextProvider = ({ children }) => {
+  /**
+   * Currency symbol used in the application.
+   * @type {string}
+   */
   const currency = '$'
+
+  /**
+   * Delivery fee for orders.
+   * @type {number}
+   */
   const deliveryFee = 40
-  const products = asset.products
+
+  /**
+   * List of products fetched from the backend.
+   * @type {Array<Object>}
+   */
+  const [products, setProducts] = useState([])
+
+  /**
+   * Search query for filtering products.
+   * @type {string}
+   */
   const [search, setSearch] = useState('')
+
+  /**
+   * Boolean flag to toggle the visibility of the search bar.
+   * @type {boolean}
+   */
   const [showSearch, setShowSearch] = useState(false)
+
+  /**
+   * Object representing items in the cart.
+   * The structure is { itemID: { size: quantity } }.
+   * @type {Object}
+   */
   const [cartItems, setCartItems] = useState({})
 
+  /**
+   * Backend API base URL.
+   * @type {string}
+   */
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+
+  /**
+   * Authentication token for API requests.
+   * @type {string}
+   */
+  const [token, setToken] = useState('')
+
+  /**
+   * Fetches product data from the backend API and updates the state.
+   * Displays a toast notification in case of an error.
+   * @async
+   * @returns {Promise<void>}
+   */
+  const getProductsData = async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/product/list')
+      if (response.data.success) {
+        setProducts(response.data.products)
+      } else {
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error('Error fetching products')
+    }
+  }
+  useEffect(() => {
+    setToken(localStorage.getItem('token') ? localStorage.getItem('token') : '')
+  }, [token])
+
+  useEffect(() => {
+    getProductsData()
+  }, [])
+
+  /**
+   * Adds an item to the cart with the specified size.
+   * Displays a toast notification on success or error.
+   *
+   * @param {Object} params - Parameters for adding to the cart.
+   * @param {string} params.itemID - ID of the product to add.
+   * @param {string} params.size - Size of the product to add.
+   * @returns {void}
+   */
   const addToCart = async ({ itemID, size }) => {
     console.log('Adding to cart - itemID:', itemID, 'size:', size)
     if (!itemID) {
@@ -38,6 +137,11 @@ export const ShopContextProvider = ({ children }) => {
     toast.success('Item added to Cart')
   }
 
+  /**
+   * Calculates the total number of items in the cart.
+   *
+   * @returns {number} The total count of items in the cart.
+   */
   const getCartCount = () => {
     try {
       let noOfItems = 0
@@ -54,12 +158,27 @@ export const ShopContextProvider = ({ children }) => {
       return 0
     }
   }
+
+  /**
+   * Updates the quantity of a specific item in the cart.
+   *
+   * @param {Object} params - Parameters for updating the quantity.
+   * @param {string} params.itemID - ID of the product to update.
+   * @param {string} params.size - Size of the product to update.
+   * @param {number} params.quantity - New quantity for the product.
+   * @returns {void}
+   */
   const updateQuantity = async ({ itemID, size, quantity }) => {
     let cartData = structuredClone(cartItems)
     cartData[itemID][size] = quantity
     setCartItems(cartData)
   }
 
+  /**
+   * Calculates the total amount for the items in the cart.
+   *
+   * @returns {number} The total cart amount.
+   */
   const getCartAmount = () => {
     let amount = 0
     for (const itemID in cartItems) {
@@ -83,6 +202,9 @@ export const ShopContextProvider = ({ children }) => {
 
   useEffect(() => {}, [cartItems])
 
+  /**
+   * Context value containing state and utility functions for the shop.
+   */
   const value = {
     products,
     currency,
@@ -96,7 +218,11 @@ export const ShopContextProvider = ({ children }) => {
     cartItems,
     getCartAmount,
     updateQuantity,
-    navigate
+    navigate,
+    backendUrl,
+    token,
+    setToken,
   }
+
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>
 }

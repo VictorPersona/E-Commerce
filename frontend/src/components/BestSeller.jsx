@@ -12,7 +12,7 @@ const BestSeller = () => {
     setBestSeller(
       products.filter((product) => product.bestseller == true).slice(6, 15)
     )
-  }, [])
+  }, [products])
   return (
     <div className="my-10">
       <div className="text-center text-3xl py-8">
