@@ -6,7 +6,9 @@ import { ShopContext } from '../context/ShopContext'
 const Navbar = () => {
   // State to manage the visibility of the mobile menu
   const [visible, setVisible] = useState(false)
-  const { showSearch, setShowSearch, getCartCount } = useContext(ShopContext)
+  const { showSearch, setShowSearch, getCartCount,navigate,token,setToken,setCartItems,logout } = useContext(ShopContext)
+
+ 
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
@@ -54,15 +56,16 @@ const Navbar = () => {
               className="w-5 cursor-pointer"
               alt="Profile"
               src={images.profile}
+              onClick={()=>{token ?"" : navigate('/login')}}
             />
           </Link>
-          <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
+          { token && <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
             <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
               <p className="cursor-pointer hover:text-black">My Profile</p>
-              <p className="cursor-pointer hover:text-black">Orders</p>
-              <p className="cursor-pointer hover:text-black">Log Out</p>
+              <p className="cursor-pointer hover:text-black" onClick={()=>navigate("/orders")}>Orders</p>
+              <p className="cursor-pointer hover:text-black" onClick={()=>logout()}>Log Out</p>
             </div>
-          </div>
+          </div>}
         </div>
 
         {/* Cart Icon with Item Count */}

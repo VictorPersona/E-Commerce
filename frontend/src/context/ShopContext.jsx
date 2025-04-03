@@ -95,6 +95,10 @@ export const ShopContextProvider = ({ children }) => {
       toast.error('Error fetching products')
     }
   }
+   const logout = () => {
+     localStorage.removeItem('token')
+     setToken('')
+   }
   useEffect(() => {
     setToken(localStorage.getItem('token') ? localStorage.getItem('token') : '')
   }, [token])
@@ -222,6 +226,7 @@ export const ShopContextProvider = ({ children }) => {
     backendUrl,
     token,
     setToken,
+    logout
   }
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>
