@@ -6,6 +6,7 @@ import { connectCloudinary } from './config/cloudinary.js'
 import userRouter from './routes/userRoutes.js'
 import productRouter from './routes/productRoute.js'
 import orderRouter from './routes/orderRoute.js'
+import cartRouter from './routes/cartRoute.js'
 
 //App Config
 dotenv.config()

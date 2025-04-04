@@ -3,6 +3,7 @@ import Add from './add.svg'
 import List from './list.svg'
 import Orders from './orders.svg'
 import UpImage from './uploadImage.png'
+import Parcel from './logistics.png'
 
 export const images = {
   Logo,
@@ -10,4 +11,5 @@ export const images = {
   List,
   Orders,
   UpImage,
+  Parcel
 }

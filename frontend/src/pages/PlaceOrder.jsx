@@ -11,7 +11,7 @@ import { ShopContext } from '../context/ShopContext'
 const PlaceOrder = () => {
   // State to track selected payment method
   const [method, setMethod] = useState('cod')
-  const { navigate,cartItems,products,getCartAmount } = useContext(ShopContext)
+  const { navigate,cartItems,products,getCartAmount,backendUrl,setCartItems } = useContext(ShopContext)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -52,6 +52,19 @@ const PlaceOrder = () => {
 
       switch(method){
         case 'cod':
+          try {
+            const response = await axios.post(backendUrl+'/api/order/place',orderData,{Headers:{Authorization:`Bearer ${token}`}})
+          if(response.data.success){
+            setCartItems({})
+            navigate('/')
+          }else{
+            toast.error(response.data.message)
+          }
+          } catch (error) {
+            console.log(error)
+            toast.error(error.message)
+          }
+          
           break;
       }
     } catch (error) {
