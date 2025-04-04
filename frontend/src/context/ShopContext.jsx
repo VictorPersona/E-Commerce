@@ -138,6 +138,14 @@ export const ShopContextProvider = ({ children }) => {
       cartData[itemID][size] = 1
     }
     setCartItems(cartData)
+    if(token){
+      try {
+          await axios.post(backendUrl + '/api/cart/add',{itemID,size},{headers:{Authorization : `Bearer ${token}`}})
+      } catch (error) {
+        console.log(error)
+        toast.error(error.message)
+      }
+    }
     toast.success('Item added to Cart')
   }
 
@@ -176,7 +184,32 @@ export const ShopContextProvider = ({ children }) => {
     let cartData = structuredClone(cartItems)
     cartData[itemID][size] = quantity
     setCartItems(cartData)
+    if (token) {
+      try {
+        await axios.put(
+          backendUrl + '/api/cart/update',
+          { itemID, size,quantity },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      } catch (error) {
+        console.log(error)
+        toast.error(error.message)
+      }
+    }
   }
+
+  const getUserCart = async(token)=>{
+    try {
+      const response  = await axios.get(backendUrl + "/api/cart/getCart",{headers:{Authorization:`Bearer ${token}`}})
+      if(response.data.success){
+        setCartItems(response.data.cartData)
+      }
+    } catch (error) {
+      console.log(error)
+      res.json({success:false,message:error.message})
+    }
+  }
+  useEffect(()=>{getUserCart()},[])
 
   /**
    * Calculates the total amount for the items in the cart.
