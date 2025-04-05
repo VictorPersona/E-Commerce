@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
 import { ShopContext } from '../context/ShopContext'
-
+import { currency } from '../../../admin/src/App'
 
 /**
  * PlaceOrder component handles the order placement form including
@@ -11,7 +11,14 @@ import { ShopContext } from '../context/ShopContext'
 const PlaceOrder = () => {
   // State to track selected payment method
   const [method, setMethod] = useState('cod')
-  const { navigate,cartItems,products,getCartAmount,backendUrl,setCartItems } = useContext(ShopContext)
+  const {
+    navigate,
+    cartItems,
+    products,
+    getCartAmount,
+    backendUrl,
+    setCartItems,
+  } = useContext(ShopContext)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -29,47 +36,104 @@ const PlaceOrder = () => {
     setForm((prevState) => ({ ...prevState, [name]: value }))
   }
 
-  const onSubmitHandler = async (e)=>{
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currecny,
+      name: 'Order Payment',
+      description: 'Order  Payment',
+      order_id: order.id,
+      receipt: order.receipt,
+      handler: async (response) => {
+        console.log(response)
+        try {
+          const response = await axios.post(
+            backendUrl + '/api/order/verifyRazorpay',
+            response,
+            { Headers: { Authorization: `Bearer ${token}` } }
+          )
+          if(data.success){
+            navigate('/orders')
+            setCartItems({})
+          }
+        } catch (error) {
+          console.log(error)
+          toast.error(error.message)
+        }
+      },
+    }
+  }
+
+  const onSubmitHandler = async (e) => {
     e.prevenDefault()
     try {
       const orderItems = []
 
-      for(const items in cartItems){
-        for(const item in cartItems[items]){
-          const itemInfo = structuredClone(products.find(product=>product._id===cartItems[items]))
-          if(itemInfo){
+      for (const items in cartItems) {
+        for (const item in cartItems[items]) {
+          const itemInfo = structuredClone(
+            products.find((product) => product._id === cartItems[items])
+          )
+          if (itemInfo) {
             itemInfo.size = item
             itemInfo.quantity = cartItems[item][items]
             orderItems.push(itemInfo)
           }
         }
       }
-      let orderData={
-        address:formData,
-        items:orderItems,
-        amount:getCartAmount
+      let orderData = {
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount,
       }
 
-      switch(method){
+      switch (method) {
         case 'cod':
           try {
-            const response = await axios.post(backendUrl+'/api/order/place',orderData,{Headers:{Authorization:`Bearer ${token}`}})
-          if(response.data.success){
-            setCartItems({})
-            navigate('/')
-          }else{
-            toast.error(response.data.message)
-          }
+            const response = await axios.post(
+              backendUrl + '/api/order/place',
+              orderData,
+              { Headers: { Authorization: `Bearer ${token}` } }
+            )
+            if (response.data.success) {
+              setCartItems({})
+              navigate('/orders')
+            } else {
+              toast.error(response.data.message)
+            }
           } catch (error) {
             console.log(error)
             toast.error(error.message)
           }
-          
-          break;
+
+          break
+        case 'stripe':
+          const responseStripe = await axios.post(
+            backendUrl + '/api/order/stripe',
+            orderData,
+            { Headers: { Authorization: `Bearer ${token}` } }
+          )
+          if (responseStripe.data.success) {
+            const { session_url } = responseStripe.data
+            window.location.replace(session_url)
+          } else {
+            toast.error(responseStripe.data.message)
+          }
+          break
+
+        case 'razorpay':
+          const responseRazorpay = await axios.post(
+            backendUrl + '/api/order/razorpay',
+            orderData,
+            { Headers: { Authorization: `Bearer ${token}` } }
+          )
+          if (responseRazorpay.data.success) {
+            initPay(responseRazorpay.data.order)
+          }
+          break
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   }
 
   return (
@@ -244,7 +308,7 @@ const PlaceOrder = () => {
         </div>
         <div className="w-full text-end mt-8">
           <button
-          type='submit'
+            type="submit"
             onClick={() => navigate('/orders')}
             className="bg-black text-white px-16 py-3 text-sm"
           >
