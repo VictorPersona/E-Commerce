@@ -9,7 +9,7 @@ const Product = () => {
   const { products, currency, addToCart } = useContext(ShopContext)
   const [productData, setProductData] = useState(false)
   const [useImage, setImage] = useState('')
-  const [productSize, setSize] = useState('')
+  const [productSize, setProductSize] = useState('')
 
   const fetchProductData = async () => {
     const product = products.find((product) => product._id === id)
@@ -18,7 +18,6 @@ const Product = () => {
       setImage(product.image[0])
     }
   }
-
 
   useEffect(() => {
     fetchProductData()
@@ -72,7 +71,7 @@ const Product = () => {
                 <div className="flex gap-2">
                   {productData.sizes.map((size, index) => (
                     <button
-                      onClick={() => setSize(size)}
+                      onClick={() => setProductSize(size)}
                       key={index}
                       className={`cursor-pointer border py-2 px-4 bg-gray-100 ${
                         productSize == size ? 'border-orange-500' : ''
@@ -82,7 +81,12 @@ const Product = () => {
                     </button>
                   ))}
                 </div>
-                <button onClick={()=>addToCart({itemID:productData._id,size:productSize})} className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700">
+                <button
+                  onClick={() =>
+                    addToCart({ itemID: productData._id, size: productSize })
+                  }
+                  className="cursor-pointer bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
+                >
                   Add to Cart
                 </button>
                 <hr className="mt-8 sm:w-4/5" />

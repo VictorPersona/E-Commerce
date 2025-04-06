@@ -186,4 +186,5 @@ export default {
   userOrders,
   updateStatus,
   verifyStripe,
+  verifyRazorpay
 }

@@ -2,6 +2,8 @@ import React, { useContext, useState } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
 import { ShopContext } from '../context/ShopContext'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 import { currency } from '../../../admin/src/App'
 
 /**
@@ -12,6 +14,7 @@ const PlaceOrder = () => {
   // State to track selected payment method
   const [method, setMethod] = useState('cod')
   const {
+    token,
     navigate,
     cartItems,
     products,
@@ -33,14 +36,14 @@ const PlaceOrder = () => {
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target
-    setForm((prevState) => ({ ...prevState, [name]: value }))
+    setFormData((prevState) => ({ ...prevState, [name]: value }))
   }
 
   const initPay = (order) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
-      currency: order.currecny,
+      currency: order.currency,
       name: 'Order Payment',
       description: 'Order  Payment',
       order_id: order.id,
@@ -48,12 +51,12 @@ const PlaceOrder = () => {
       handler: async (response) => {
         console.log(response)
         try {
-          const response = await axios.post(
+          const verifyResponse = await axios.post(
             backendUrl + '/api/order/verifyRazorpay',
             response,
             { Headers: { Authorization: `Bearer ${token}` } }
           )
-          if(data.success){
+          if (verifyResponse.data.success) {
             navigate('/orders')
             setCartItems({})
           }
@@ -62,30 +65,40 @@ const PlaceOrder = () => {
           toast.error(error.message)
         }
       },
+      modal: {
+        ondismiss: () => {
+          toast.error('Payment was cancelled.')
+        },
+      },
     }
   }
 
   const onSubmitHandler = async (e) => {
-    e.prevenDefault()
+    e.preventDefault()
+    if (!['cod', 'stripe', 'razorpay'].includes(method)) {
+      toast.error('Please select a valid payment method.')
+      return
+    }
     try {
       const orderItems = []
 
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          const itemInfo = structuredClone(
-            products.find((product) => product._id === cartItems[items])
-          )
-          if (itemInfo) {
-            itemInfo.size = item
-            itemInfo.quantity = cartItems[item][items]
-            orderItems.push(itemInfo)
+      for (const itemId in cartItems) {
+        const itemInfo = JSON.parse(
+          JSON.stringify(products.find((product) => product._id === itemId))
+        )
+        if (itemInfo) {
+          for (const size in cartItems[itemId]) {
+            const clonedItem = { ...itemInfo }
+            clonedItem.size = size
+            clonedItem.quantity = cartItems[itemId][size]
+            orderItems.push(clonedItem)
           }
         }
       }
       let orderData = {
         address: formData,
         items: orderItems,
-        amount: getCartAmount,
+        amount: getCartAmount(),
       }
 
       switch (method) {
@@ -133,11 +146,17 @@ const PlaceOrder = () => {
           }
           break
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error('Error placing order:', error)
+      toast.error('Failed to place order. Please try again.')
+    }
   }
 
   return (
-    <form className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh]">
+    <form
+      onSubmit={onSubmitHandler}
+      className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh]"
+    >
       {/* Delivery Information Form Section */}
       <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
         <div className="text-xl sm:text-2xl my-3">
@@ -309,8 +328,7 @@ const PlaceOrder = () => {
         <div className="w-full text-end mt-8">
           <button
             type="submit"
-            onClick={() => navigate('/orders')}
-            className="bg-black text-white px-16 py-3 text-sm"
+            className="cursor-pointer bg-black text-white px-16 py-3 text-sm"
           >
             Place Order
           </button>

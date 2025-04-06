@@ -1,8 +1,9 @@
 import React from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { backendUrl, currency } from '../App'
 import { images } from '../assets/Assets'
+import { toast } from 'react-toastify'
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([])
@@ -13,7 +14,7 @@ const Orders = ({ token }) => {
     }
     try {
       const response = await axios.post(
-        backendUrl + '/api/orders/list',
+        backendUrl + '/api/order/list',
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -29,10 +30,13 @@ const Orders = ({ token }) => {
     }
   }
 
-  const statusHandler  = async(event,orderId)=>{
+  const statusHandler = async (event, orderId) => {
     try {
-      const response = await axios.post(backendUrl+'/api/order/status',{orderId,status:event.target.value})
-      if(response.data.success){
+      const response = await axios.post(backendUrl + '/api/order/status', {
+        orderId,
+        status: event.target.value,
+      })
+      if (response.data.success) {
         await fetchAllOrders()
       }
     } catch (error) {
@@ -105,7 +109,12 @@ const Orders = ({ token }) => {
                 {currency}
                 {order.amount}
               </p>
-              <select onChange={(event)=>statusHandler(event,order._id)}name="" id="" className="p-2 font-semibold">
+              <select
+                onChange={(event) => statusHandler(event, order._id)}
+                name=""
+                id=""
+                className="p-2 font-semibold"
+              >
                 <option value="Order Placed">Order Placed</option>
                 <option value="Packing">Packing</option>
                 <option value="Shipped">Shipped</option>

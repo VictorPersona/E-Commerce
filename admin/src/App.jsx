@@ -4,15 +4,15 @@ import Sidebar from './components/Sidebar'
 import { Route, Routes } from 'react-router-dom'
 import Add from './pages/Add'
 import List from './pages/List'
-import Orders from '../../frontend/src/pages/Orders'
+import Orders from './pages/Orders.jsx'
 import { useState } from 'react'
 import Login from './components/Login'
 import { ToastContainer, toast } from 'react-toastify' // ✅ Correct
 import 'react-toastify/dist/ReactToastify.css'
-import { useEffect, useContext } from 'react'
+import { useEffect } from 'react'
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
-export const currency = "$"
+export const currency = '$'
 
 const App = () => {
   const [token, setToken] = useState(
